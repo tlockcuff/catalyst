@@ -238,6 +238,14 @@ export const withRoutes: MiddlewareFactory = () => {
   return async (request, event) => {
     const locale = request.headers.get('x-bc-locale') ?? '';
 
+    const cleanPathname = clearLocaleFromPath(request.nextUrl.pathname, locale);
+
+    if (cleanPathname.startsWith('/deini')) {
+      const destination = `/${locale}/product/111/static`;
+
+      return NextResponse.rewrite(new URL(destination, request.url));
+    }
+
     const { route, status } = await getRouteInfo(request, event);
 
     if (status === 'MAINTENANCE') {
