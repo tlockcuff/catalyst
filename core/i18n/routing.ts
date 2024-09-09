@@ -1,6 +1,36 @@
 import { createSharedPathnamesNavigation } from 'next-intl/navigation';
 import { defineRouting, LocalePrefix } from 'next-intl/routing';
 
+import { client } from '~/client';
+import { graphql } from '~/client/graphql';
+
+const GetEnabledLocalesQuery = graphql(`
+  query GetEnabledLocales {
+    site {
+      settings {
+        locales {
+          code
+          # isDefault
+        }
+      }
+    }
+  }
+`);
+
+const getEnabledLocales = async (channelId) => {
+  const response = await client.fetch({
+    document: GetRouteQuery,
+    variables: { path },
+    fetchOptions: {
+      cache: 'force-cache',
+      next: { revalidate: 86400 }, // 24 hours
+    },
+    channelId,
+  });
+
+  return response.data.site.route;
+};
+
 // Enable locales by including them here.
 // List includes locales with existing messages support.
 export const locales = [
