@@ -48,8 +48,8 @@ export default function Login({ params: { locale } }: Props) {
   );
 }
 
-export function generateStaticParams() {
-  return locales.map((locale) => ({ locale }));
-}
+// export function generateStaticParams() {
+//   return locales.map((locale) => ({ locale }));
+// }
 
-export const dynamic = 'force-static';
+// export const dynamic = 'force-static';

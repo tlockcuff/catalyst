@@ -10,6 +10,7 @@ let nextConfig = {
   reactStrictMode: true,
   experimental: {
     optimizePackageImports: ['@icons-pack/react-simple-icons'],
+    ppr: 'incremental',
   },
   typescript: {
     ignoreBuildErrors: !!process.env.CI,
