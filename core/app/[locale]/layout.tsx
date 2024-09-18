@@ -36,7 +36,7 @@ const RootLayoutMetadataQuery = graphql(`
   }
 `);
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadataNotNow(): Promise<Metadata> {
   const { data } = await client.fetch({
     document: RootLayoutMetadataQuery,
     fetchOptions: { next: { revalidate } },
