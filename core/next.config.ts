@@ -1,12 +1,19 @@
-// @ts-check
-const createNextIntlPlugin = require('next-intl/plugin');
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+import bundleAnalyzer from '@next/bundle-analyzer';
+import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
+import { optimize } from 'webpack';
+
+import { writeBuildConfig } from './build-config/writer';
+import { client } from './client';
+import { graphql } from './client/graphql';
+import { cspHeader } from './lib/content-security-policy';
 
 const withNextIntl = createNextIntlPlugin();
 
-const { cspHeader } = require('./lib/content-security-policy');
-
-/** @type {import('next').NextConfig} */
-let nextConfig = {
+let nextConfig: NextConfig = {
   reactStrictMode: true,
   experimental: {
     optimizePackageImports: ['@icons-pack/react-simple-icons'],
@@ -24,7 +31,9 @@ let nextConfig = {
         get() {
           return 'source-map';
         },
-        set() {},
+        set() {
+          // No empty
+        },
       });
     }
 
@@ -33,7 +42,7 @@ let nextConfig = {
     // Simply set the WEBPACK_MAX_CHUNKS environment variable to the desired number of chunks
     if (!isServer) {
       config.plugins.push(
-        new (require('webpack').optimize.LimitChunkCountPlugin)({
+        new optimize.LimitChunkCountPlugin({
           maxChunks: process.env.WEBPACK_MAX_CHUNKS
             ? parseInt(process.env.WEBPACK_MAX_CHUNKS, 10)
             : 50,
@@ -45,6 +54,7 @@ let nextConfig = {
   },
   // default URL generation in BigCommerce uses trailing slash
   trailingSlash: process.env.TRAILING_SLASH !== 'false',
+  // eslint-disable-next-line @typescript-eslint/require-await
   async headers() {
     return [
       {
@@ -68,9 +78,30 @@ let nextConfig = {
 nextConfig = withNextIntl(nextConfig);
 
 if (process.env.ANALYZE === 'true') {
-  const withBundleAnalyzer = require('@next/bundle-analyzer')();
+  const withBundleAnalyzer = bundleAnalyzer();
 
   nextConfig = withBundleAnalyzer(nextConfig);
 }
 
-module.exports = nextConfig;
+const LocaleQuery = graphql(`
+  query LocaleQuery {
+    site {
+      settings {
+        locales {
+          code
+          isDefault
+        }
+      }
+    }
+  }
+`);
+
+export default async () => {
+  const rng = await client.fetch({
+    document: LocaleQuery,
+  });
+
+  await writeBuildConfig({ locales: rng.data.site.settings?.locales });
+
+  return nextConfig;
+};
