@@ -1,6 +1,6 @@
 import { getTranslations, unstable_setRequestLocale } from 'next-intl/server';
 
-import { locales, LocaleType } from '~/i18n/routing';
+import { locales } from '~/i18n/routing';
 
 import { TabHeading } from '../../_components/tab-heading';
 
@@ -15,7 +15,7 @@ export async function generateMetadata() {
 }
 
 interface Props {
-  params: { locale: LocaleType };
+  params: { locale: string };
 }
 
 export default function ChangePassword({ params: { locale } }: Props) {

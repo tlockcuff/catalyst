@@ -1,11 +1,10 @@
 import { notFound } from 'next/navigation';
 import { getRequestConfig } from 'next-intl/server';
 
-import { locales, LocaleType } from './routing';
+import { locales } from './routing';
 
 export default getRequestConfig(async ({ locale }) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  if (!locales.includes(locale as LocaleType)) {
+  if (!locales.includes(locale)) {
     notFound();
   }
 

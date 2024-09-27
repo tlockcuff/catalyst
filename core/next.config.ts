@@ -97,11 +97,9 @@ const LocaleQuery = graphql(`
 `);
 
 export default async () => {
-  const rng = await client.fetch({
-    document: LocaleQuery,
-  });
+  const { data } = await client.fetch({ document: LocaleQuery });
 
-  await writeBuildConfig({ locales: rng.data.site.settings?.locales });
+  await writeBuildConfig({ locales: data.site.settings?.locales });
 
   return nextConfig;
 };
