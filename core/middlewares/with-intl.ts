@@ -1,5 +1,6 @@
 import createMiddleware from 'next-intl/middleware';
 
+import { buildConfig } from '~/build-config/reader';
 import { routing } from '~/i18n/routing';
 
 import { type MiddlewareFactory } from './compose-middlewares';
@@ -29,6 +30,11 @@ export const withIntl: MiddlewareFactory = (next) => {
         response?.headers.set(k, v);
       }
     });
+
+    const locales = buildConfig.get('locales');
+    const first = locales[0];
+
+    response?.headers.set('x-bc-test-config', JSON.stringify(first));
 
     return response;
   };
