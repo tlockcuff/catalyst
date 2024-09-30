@@ -435,7 +435,7 @@ export const UpdateSettingsForm = ({
             </Button>
             <Link
               className="mt-2 w-fit font-semibold text-primary hover:text-secondary md:ms-auto md:mt-0"
-              href="/account/settings/change-password"
+              href="/account/change-password"
             >
               {t('changePassword')}
             </Link>
