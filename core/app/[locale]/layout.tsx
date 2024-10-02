@@ -1,10 +1,8 @@
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import { NextIntlClientProvider, useMessages } from 'next-intl';
-import { unstable_setRequestLocale } from 'next-intl/server';
-import { PropsWithChildren } from 'react';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, unstable_setRequestLocale } from 'next-intl/server';
+import { cache, PropsWithChildren } from 'react';
 
 import '../globals.css';
 
@@ -12,8 +10,12 @@ import { client } from '~/client';
 import { graphql } from '~/client/graphql';
 import { revalidate } from '~/client/revalidate-target';
 
+import { getChannelIdFromLocale } from '../../channels.config';
 import { Notifications } from '../notifications';
-import { Providers } from '../providers';
+
+import { WebAnalyticsFragment } from './_components/fragment';
+import { Providers } from './_components/providers';
+import { VercelComponents } from './_components/vercel';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,26 +23,34 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
-const RootLayoutMetadataQuery = graphql(`
-  query RootLayoutMetadataQuery {
-    site {
-      settings {
-        storeName
-        seo {
-          pageTitle
-          metaDescription
-          metaKeywords
+const RootLayoutMetadataQuery = graphql(
+  `
+    query RootLayoutMetadataQuery {
+      site {
+        settings {
+          storeName
+          seo {
+            pageTitle
+            metaDescription
+            metaKeywords
+          }
+          ...WebAnalyticsFragment
         }
       }
     }
-  }
-`);
+  `,
+  [WebAnalyticsFragment],
+);
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { data } = await client.fetch({
+const getRootLayoutData = cache(async () => {
+  return await client.fetch({
     document: RootLayoutMetadataQuery,
     fetchOptions: { next: { revalidate } },
   });
+});
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { data } = await getRootLayoutData();
 
   const storeName = data.site.settings?.storeName ?? '';
 
@@ -63,36 +73,28 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const VercelComponents = () => {
-  if (process.env.VERCEL !== '1') {
-    return null;
-  }
-
-  return (
-    <>
-      {process.env.DISABLE_VERCEL_ANALYTICS !== 'true' && <Analytics />}
-      {process.env.DISABLE_VERCEL_SPEED_INSIGHTS !== 'true' && <SpeedInsights />}
-    </>
-  );
-};
-
 interface Props extends PropsWithChildren {
   params: { locale: string };
 }
 
-export default function RootLayout({ children, params: { locale } }: Props) {
+export default async function RootLayout({ children, params: { locale } }: Props) {
   // need to call this method everywhere where static rendering is enabled
   // https://next-intl-docs.vercel.app/docs/getting-started/app-router#add-unstable_setrequestlocale-to-all-layouts-and-pages
   unstable_setRequestLocale(locale);
 
-  const messages = useMessages();
+  const { data } = await getRootLayoutData();
+  const messages = await getMessages();
+
+  const channelId = getChannelIdFromLocale(locale);
 
   return (
     <html className={`${inter.variable} font-sans`} lang={locale}>
       <body className="flex h-screen min-w-[375px] flex-col">
         <Notifications />
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Providers>{children}</Providers>
+          <Providers channelId={Number(channelId)} settings={data.site.settings}>
+            {children}
+          </Providers>
         </NextIntlClientProvider>
         <VercelComponents />
       </body>

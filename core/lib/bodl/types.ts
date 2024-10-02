@@ -1,16 +1,16 @@
 // TODO: import this types from bodl-events package?
-declare global {
-  interface Window {
-    bodlEvents?: {
-      cart?: {
-        emit: (event: string, payload: unknown) => void;
-      };
-      product?: {
-        emit: (event: string, payload: unknown) => void;
-      };
-    };
-  }
-}
+// declare global {
+//   interface Window {
+//     bodlEvents?: {
+//       cart?: {
+//         emit: (event: string, payload: unknown) => void;
+//       };
+//       product?: {
+//         emit: (event: string, payload: unknown) => void;
+//       };
+//     };
+//   }
+// }
 
 export interface BodlConfig {
   channel_id: number;

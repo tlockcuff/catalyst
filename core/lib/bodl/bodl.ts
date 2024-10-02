@@ -17,14 +17,14 @@ export class Bodl {
   navigation = {
     // search: this.call((payload: any) => null),
     productViewed: this.call<bodl_v1_product_page_viewed>((payload) => {
-      window.bodlEvents?.product?.emit('bodl_v1_product_page_viewed', {
+      window.bodlEvents?.product.emit('bodl_v1_product_page_viewed', {
         event_id: uuidv4(),
         channel_id: this.config.channel_id,
         ...payload,
       });
     }),
     categoryViewed: this.call<bodl_v1_product_category_viewed>((payload) => {
-      window.bodlEvents?.product?.emit('bodl_v1_product_category_viewed', {
+      window.bodlEvents?.product.emit('bodl_v1_product_category_viewed', {
         event_id: uuidv4(),
         channel_id: this.config.channel_id,
         ...payload,
@@ -34,21 +34,21 @@ export class Bodl {
 
   cart = {
     productAdded: this.call<bodl_v1_cart_product_added>((payload) => {
-      window.bodlEvents?.cart?.emit('bodl_v1_cart_product_added', {
+      window.bodlEvents?.cart.emit('bodl_v1_cart_product_added', {
         event_id: uuidv4(),
         channel_id: this.config.channel_id,
         ...payload,
       });
     }),
     productRemoved: this.call<bodl_v1_cart_product_removed>((payload) => {
-      window.bodlEvents?.cart?.emit('bodl_v1_cart_product_removed', {
+      window.bodlEvents?.cart.emit('bodl_v1_cart_product_removed', {
         event_id: uuidv4(),
         channel_id: this.config.channel_id,
         ...payload,
       });
     }),
     cartViewed: this.call<bodl_v1_cart_viewed>((payload) => {
-      window.bodlEvents?.cart?.emit('bodl_v1_cart_viewed', {
+      window.bodlEvents?.cart.emit('bodl_v1_cart_viewed', {
         event_id: uuidv4(),
         channel_id: this.config.channel_id,
         ...payload,

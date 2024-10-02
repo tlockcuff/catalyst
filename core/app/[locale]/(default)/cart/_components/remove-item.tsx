@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { toast } from 'react-hot-toast';
 
 import { FragmentOf } from '~/client/graphql';
-import { bodl } from '~/lib/bodl';
+import { useAnalytics } from '~/lib/analytics/react';
 
 import { removeItem } from '../_actions/remove-item';
 
@@ -41,6 +41,7 @@ const lineItemTransform = (item: Product) => {
 
 export const RemoveItem = ({ currency, product }: Props) => {
   const t = useTranslations('Cart.SubmitRemoveItem');
+  const analytics = useAnalytics();
 
   const onSubmitRemoveItem = async () => {
     const { status } = await removeItem({
@@ -55,7 +56,7 @@ export const RemoveItem = ({ currency, product }: Props) => {
       return;
     }
 
-    bodl.cart.productRemoved({
+    analytics?.cart.productRemoved({
       currency,
       product_value: product.listPrice.value * product.quantity,
       line_items: [lineItemTransform(product)],

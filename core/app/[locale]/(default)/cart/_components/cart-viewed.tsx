@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 
 import { FragmentOf } from '~/client/graphql';
-import { bodl } from '~/lib/bodl';
+import { useAnalytics } from '~/lib/analytics/react';
 
 import { CartItemFragment } from './cart-item';
 import { CheckoutSummaryFragment } from './checkout-summary';
@@ -36,13 +36,15 @@ const lineItemTransform = (item: lineItem) => {
 };
 
 export const CartViewed = ({ checkout, currencyCode, lineItems }: Props) => {
+  const analytics = useAnalytics();
+
   useEffect(() => {
-    bodl.cart.cartViewed({
+    analytics?.cart.cartViewed({
       currency: currencyCode,
       cart_value: checkout?.grandTotal?.value ?? 0,
       line_items: lineItems.map(lineItemTransform),
     });
-  }, [currencyCode, lineItems, checkout]);
+  }, [analytics, currencyCode, lineItems, checkout]);
 
   return null;
 };

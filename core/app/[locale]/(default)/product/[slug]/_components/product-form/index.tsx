@@ -11,7 +11,7 @@ import { ProductItemFragment } from '~/client/fragments/product-item';
 import { AddToCartButton } from '~/components/add-to-cart-button';
 import { Link } from '~/components/link';
 import { Button } from '~/components/ui/button';
-import { bodl } from '~/lib/bodl';
+import { useAnalytics } from '~/lib/analytics/react';
 
 import { handleAddToCart } from './_actions/add-to-cart';
 import { CheckboxField } from './fields/checkbox-field';
@@ -59,6 +59,7 @@ export const Submit = ({ data: product }: Props) => {
 
 export const ProductForm = ({ data: product }: Props) => {
   const t = useTranslations('Product.Form');
+  const analytics = useAnalytics();
   const productOptions = removeEdgesAndNodes(product.productOptions);
 
   const { handleSubmit, register, ...methods } = useProductForm();
@@ -77,7 +78,7 @@ export const ProductForm = ({ data: product }: Props) => {
 
     const transformedProduct = productItemTransform(product);
 
-    bodl.cart.productAdded({
+    analytics?.cart.productAdded({
       product_value: transformedProduct.purchase_price * quantity,
       currency: transformedProduct.currency,
       line_items: [

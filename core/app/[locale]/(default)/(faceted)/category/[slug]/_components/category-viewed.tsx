@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 
 import { FragmentOf } from '~/client/graphql';
 import { ProductCardFragment } from '~/components/product-card/fragment';
-import { bodl } from '~/lib/bodl';
+import { useAnalytics } from '~/lib/analytics/react';
 
 import { getCategoryPageData } from '../page-data';
 
@@ -35,13 +35,15 @@ const productItemTransform = (p: productSearchItem, c: Category) => {
 };
 
 export const CategoryViewed = ({ categoryId, category, products }: Props) => {
+  const analytics = useAnalytics();
+
   useEffect(() => {
-    bodl.navigation.categoryViewed({
+    analytics?.navigation.categoryViewed({
       category_id: categoryId,
       category_name: category?.name ?? '',
       line_items: products.map((p) => productItemTransform(p, category)),
     });
-  }, [category, categoryId, products]);
+  }, [analytics, category, categoryId, products]);
 
   return null;
 };
