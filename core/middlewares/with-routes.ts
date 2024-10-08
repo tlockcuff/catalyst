@@ -261,10 +261,7 @@ export const withRoutes: MiddlewareFactory = () => {
           // For all other cases, assume an internal redirect and construct the URL
           // based on the current request URL to maintain internal redirection
           // in non-production environments
-          const redirectPathname = new URL(route.redirect.toUrl).pathname;
-          const redirectUrl = new URL(redirectPathname, request.url);
-
-          return NextResponse.redirect(redirectUrl, redirectConfig);
+          break;
         }
       }
     }
